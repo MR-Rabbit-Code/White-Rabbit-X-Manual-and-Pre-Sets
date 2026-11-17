@@ -286,7 +286,7 @@
         </div>
 
         <div>
-          <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Audit feed (vigia)</h2>
+          <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Auditoria (vigia)</h2>
           <div style="border-radius:12px;border:1px solid {{ pal.line }};background:{{ pal.cardTop }};max-height:420px;overflow-y:auto;">
             <sc-for list="{{ auditoriaRows }}" as="ar" hint-placeholder-count="4">
               <div style="padding:8px 14px;border-bottom:1px solid {{ pal.line }};font-size:12px;">
@@ -807,7 +807,8 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
-    Promise.all([import('/static/mock-data.js'), import('/static/i18n.js')]).then(([mock, i18n]) => {
+    // mock-data.js so e baixado com ?demo (17/11/2026): fora do demo o pacote real nunca carrega dado de exemplo
+    Promise.all([this.DEMO ? import('/static/mock-data.js') : Promise.resolve(null), import('/static/i18n.js')]).then(([mock, i18n]) => {
       this.MOCK = mock; this.I18N = i18n; this.forceUpdate();
       this.state.sistemasSel = {};
       this.carregarConfig().then(() => this.carregarPerfil());
