@@ -69,6 +69,7 @@ import ready_library
 import relatorio_resumo
 import auto_manager_live
 import em_prova
+import ao_vivo_receptor
 import wrx_paths
 from generate_system_sets import ASSETS, CLASSES, SYSTEMS
 from mt5_runner import fechar_terminal, terminal_aberto
@@ -1417,6 +1418,12 @@ def implantacao_sugestoes(saldo: float = 0.0) -> JSONResponse:
         "pool": len(disponiveis),
         "com_serie": len(series),
     })
+
+
+@app.get("/api/ao_vivo")
+def ao_vivo() -> JSONResponse:
+    """Aba "Ao vivo": o receptor (slots na conta demo + book virtual), lido de `_execucao/WhiteRabbit`. So le."""
+    return JSONResponse(ao_vivo_receptor.carregar())
 
 
 @app.get("/api/implantacao/em_prova")

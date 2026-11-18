@@ -301,6 +301,81 @@
     </sc-if>
 
     <!-- ================= RUN SETUP ================= -->
+    <sc-if value="{{ tabAoVivo }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Ao vivo" style="animation:wrxFade .35s ease both;display:flex;flex-direction:column;gap:16px;">
+        <sc-if value="{{ aoVivo.erro }}" hint-placeholder-val="{{ false }}">
+          <div style="background:{{ pal.noBg }};color:{{ pal.text }};border-radius:12px;padding:14px 18px;font-size:13px;">{{ aoVivo.erro }}</div>
+        </sc-if>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+          <sc-for list="{{ aoVivo.cards }}" as="av_card" hint-placeholder-count="5">
+            <div style="background:{{ pal.cardGradient }};border:1px solid {{ pal.line }};border-radius:14px;padding:14px 20px;min-width:130px;flex:1 1 130px;box-shadow:{{ pal.shadowCard }};">
+              <div style="font-size:11.5px;color:{{ pal.muted }};text-transform:uppercase;letter-spacing:.06em;">{{ av_card.label }}</div>
+              <b style="display:block;font-size:26px;font-family:'IBM Plex Mono',monospace;margin-top:4px;color:{{ av_card.color }};">{{ av_card.value }}</b>
+              <div style="font-size:11.5px;color:{{ pal.muted }};margin-top:2px;">{{ av_card.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline;">
+            <h2 style="font-size:13px;color:{{ pal.muted }};margin:0;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Book virtual · equity</h2>
+            <span style="font-size:12px;color:{{ pal.muted }};">{{ aoVivo.curvaRotulo }}</span>
+          </div>
+          <svg viewBox="0 0 600 120" preserveAspectRatio="none" role="img" aria-label="{{ aoVivo.curvaRotulo }}" style="width:100%;height:120px;margin-top:10px;display:block;">
+            <path d="{{ aoVivo.curvaArea }}" fill="{{ pal.accent2 }}" fill-opacity="0.15"></path>
+            <path d="{{ aoVivo.curvaLinha }}" fill="none" stroke="{{ pal.accent2 }}" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+          </svg>
+        </div>
+        <div style="background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+          <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Slots no receptor</h2>
+          <p style="color:{{ pal.muted }};font-size:12px;line-height:1.5;margin:0 0 12px;">Cada slot é um set rodando no motor e replicado na conta demo. A barra é a incubação: trades fechados ao vivo até {{ aoVivo.alvo }} (aí o p deixa de ser o do teste e passa a ser o do live). "Teste" é o que a validação mediu antes de subir. O pior aparece primeiro.</p>
+          <div style="overflow-x:auto;border-radius:12px;border:1px solid {{ pal.line }};">
+          <table style="border-collapse:collapse;width:100%;font-size:12.5px;background:{{ pal.cardTop }};">
+            <thead><tr>
+              <th style="text-align:left;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Estado</th>
+              <th style="text-align:left;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Slot</th>
+              <th style="text-align:left;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Incubação</th>
+              <th style="text-align:right;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Saldo virtual</th>
+              <th style="text-align:right;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Resultado</th>
+              <th style="text-align:right;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Abertas (motor / conta)</th>
+              <th style="text-align:left;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Teste</th>
+              <th style="text-align:left;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Último tick</th>
+            </tr></thead>
+            <tbody>
+            <sc-for list="{{ aoVivo.slots }}" as="av_s" hint-placeholder-count="5">
+              <tr>
+                <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};white-space:nowrap;"><span style="color:{{ av_s.cor }};font-weight:700;">{{ av_s.forma }}</span> {{ av_s.palavra }}</td>
+                <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};"><b>{{ av_s.simbolo }}</b><div style="color:{{ pal.muted }};font-size:11.5px;">{{ av_s.sistema }} · desde {{ av_s.desde }}</div></td>
+                <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};min-width:150px;">
+                  <div style="height:7px;border-radius:4px;background:{{ pal.bg3 }};overflow:hidden;"><div style="height:7px;width:{{ av_s.incPct }};background:{{ pal.accent2 }};"></div></div>
+                  <div style="color:{{ pal.muted }};font-size:11.5px;margin-top:4px;">{{ av_s.incTexto }}</div>
+                </td>
+                <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};text-align:right;font-family:'IBM Plex Mono',monospace;">{{ av_s.saldo }}</td>
+                <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ av_s.corNet }};">{{ av_s.net }}</td>
+                <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};text-align:right;font-family:'IBM Plex Mono',monospace;">{{ av_s.abertas }}</td>
+                <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};color:{{ pal.muted }};font-size:11.5px;">{{ av_s.teste }}</td>
+                <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};color:{{ pal.muted }};font-size:11.5px;white-space:nowrap;">{{ av_s.tick }}</td>
+              </tr>
+            </sc-for>
+            </tbody>
+          </table>
+          </div>
+        </div>
+        <div style="background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+          <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">O que o receptor fez (últimos eventos)</h2>
+          <div style="max-height:360px;overflow-y:auto;border-radius:12px;border:1px solid {{ pal.line }};background:{{ pal.cardTop }};">
+            <sc-for list="{{ aoVivo.eventos }}" as="av_e" hint-placeholder-count="6">
+              <div style="padding:8px 14px;border-bottom:1px solid {{ pal.line }};font-size:12px;display:flex;gap:12px;">
+                <span style="color:{{ pal.muted }};font-family:'IBM Plex Mono',monospace;white-space:nowrap;">{{ av_e.quando }}</span>
+                <b style="color:{{ av_e.cor }};white-space:nowrap;">{{ av_e.tipo }}</b>
+                <span>{{ av_e.texto }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <p style="color:{{ pal.muted }};font-size:11.5px;margin:0;">{{ aoVivo.rodape }}</p>
+      </section>
+    </sc-if>
+
     <sc-if value="{{ tabConfigurar }}" hint-placeholder-val="{{ false }}">
       <section data-screen-label="Configurar corrida" style="animation:wrxFade .35s ease both;">
         <div style="background:{{ pal.boxGradient }};border-radius:16px;padding:22px 24px;box-shadow:{{ pal.shadowCard }};">
@@ -815,7 +890,7 @@ class Component extends DCLogic {
       this.carregarStatus(); this.carregarEstado(); this.carregarHeatmap(); this.carregarAuditoria();
     });
     const ms = this.props.intervaloAtualizacaoMs || 8000;
-    this._interval = setInterval(() => { this.carregarStatus(); this.carregarEstado(); this.carregarHeatmap(); this.carregarAuditoria(); }, ms);
+    this._interval = setInterval(() => { this.carregarStatus(); this.carregarEstado(); this.carregarHeatmap(); this.carregarAuditoria(); if (this.state.tab === 'aovivo') this.carregarAoVivo(); }, ms);
     this._bip = (e) => { e.preventDefault(); this.setState({ installEvt: e, showInstall: true }); };
     window.addEventListener('beforeinstallprompt', this._bip);
   }
@@ -869,6 +944,7 @@ class Component extends DCLogic {
     if (tab === 'biblioteca') this.carregarBiblioteca();
     if (tab === 'portfolios') this.carregarPortfolios();
     if (tab === 'custo') this.carregarCusto();
+    if (tab === 'aovivo') this.carregarAoVivo();
     if (tab === 'implantacao') { this.carregarImplantacao().then(() => this.carregarEmProva()); this.carregarSugestoes(); }
   }
   setFamilia(f) {
@@ -1103,6 +1179,61 @@ class Component extends DCLogic {
     }
   }
   async carregarImplantacao() { return this.load('/api/implantacao', () => this.MOCK.mockImplantacao(), 'implantacao'); }
+  // Aba "Ao vivo" (18/11/2026): o receptor (slots na conta demo + book virtual), lido de /api/ao_vivo (ao_vivo_receptor.py). So le.
+  async carregarAoVivo() {
+    try { const d = await this.getReal('/api/ao_vivo'); this.setState({ aoVivoDados: d }); }
+    catch (e) { this.setState({ aoVivoDados: { ok: false, erro: 'Sem resposta do painel para o receptor.' } }); }
+  }
+  montarAoVivo(pal) {
+    const d = this.state.aoVivoDados;
+    const vazio = { erro: '', cards: [], slots: [], eventos: [], curvaLinha: '', curvaArea: '', curvaRotulo: '', alvo: 30, rodape: '' };
+    if (!d) return Object.assign(vazio, { rodape: 'Carregando o receptor…' });
+    if (!d.ok) return Object.assign(vazio, { erro: d.erro || 'Receptor indisponível.' });
+    const r = d.resumo || {}, br = (v, n = 2) => v == null ? '—' : Number(v).toLocaleString('pt-BR', { minimumFractionDigits: n, maximumFractionDigits: n });
+    const sinal = (v) => v == null ? '—' : (v > 0 ? '+' : '') + br(v);
+    const FORMA = { ok: '●', warn: '▲', bad: '✕', off: '○' }, COR = { ok: pal.ok, warn: pal.gold, bad: pal.no, off: pal.muted };
+    const idade = (s) => s == null ? '—' : s < 90 ? `há ${Math.round(s)} s` : s < 5400 ? `há ${Math.round(s / 60)} min` : `há ${(s / 3600).toFixed(1).replace('.', ',')} h`;
+    const conta = d.conta || {}, book = d.book || {};
+    const cards = [
+      { label: 'Slots rodando', value: `${r.rodando || 0}/${r.slots || 0}`, sub: (r.atencao ? `${r.atencao} em atenção` : 'nenhum em atenção') + (r.incubando ? ` · ${r.incubando} incubando` : ''), color: r.atencao ? pal.gold : pal.ok },
+      { label: 'Resultado virtual', value: sinal(r.net_virtual), sub: `${r.fechados || 0} trades fechados`, color: (r.net_virtual || 0) >= 0 ? pal.ok : pal.no },
+      { label: 'Posições na conta', value: String(r.abertas || 0), sub: r.orfas ? `${r.orfas} órfã(s)!` : 'nenhuma órfã', color: r.orfas ? pal.no : pal.text },
+      { label: 'Conta demo', value: br(conta.equity, 0), sub: `${conta.login || '—'} · ${conta.servidor || ''}`, color: pal.text },
+      { label: 'Retrato', value: idade(d.idade_s), sub: d.retrato_velho ? 'receptor parado?' : `modo ${d.modo || '—'}${d.somente_demo ? ' · só demo' : ''}`, color: d.retrato_velho ? pal.no : pal.text },
+    ];
+    const slots = (d.slots || []).map((x) => {
+      const t = x.teste || {}, nv = t.nunca_visto || {};
+      const partes = x.id.split('__');
+      return {
+        forma: FORMA[x.estado] || '○', cor: COR[x.estado] || pal.muted, palavra: x.palavra, simbolo: x.simbolo || partes[0],
+        sistema: partes.slice(1).join(' · ').replace(/_/g, ' '), desde: x.vivo_desde || '—',
+        incPct: `${Math.round((x.progresso_incubacao || 0) * 100)}%`,
+        incTexto: x.incubacao ? `${x.fechados}/${d.resumo.alvo_incubacao} trades · ${x.incubacao_fase || 'coletando'}` : `${x.fechados} trades · fora da incubação`,
+        saldo: br(x.saldo_virtual), net: sinal(x.net_virtual) + (x.retorno_pct == null ? '' : ` (${sinal(x.retorno_pct)}%)`),
+        corNet: (x.net_virtual || 0) > 0 ? pal.ok : (x.net_virtual || 0) < 0 ? pal.no : pal.text,
+        abertas: `${x.abertas_motor ?? '—'} / ${x.abertas_terminal ?? '—'}` + (x.orfas ? ` · ${x.orfas} órfã` : '') + (x.vetados ? ` · ${x.vetados} veto` : ''),
+        teste: [t.nota, t.p_bruto != null ? `p bruto ${br(t.p_bruto, 4)}` : null, t.n_oos != null ? `${t.n_oos} OOS` : null, nv.lucro != null ? `nunca visto ${sinal(nv.lucro)}` : null, t.dd_3anos_pct != null ? `DD 3a ${br(t.dd_3anos_pct, 1)}%` : null].filter(Boolean).join(' · ') || '—',
+        tick: idade(x.idade_tick_s),
+      };
+    });
+    const COR_EV = { abrir: pal.ok, fechar: pal.accent2, sem_ticks: pal.gold, slot_rebase: pal.muted };
+    const eventos = (d.eventos || []).map((e) => {
+      const dt = new Date(e.ts * 1000);
+      const texto = [e.slot, e.lado, e.volume != null ? `${e.volume} lote` : null, e.preco_fill != null ? `fill ${e.preco_fill}` : null, e.motivo].filter(Boolean).join(' · ');
+      return { quando: `${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')} ${dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`, tipo: e.tipo, cor: COR_EV[e.tipo] || pal.text, texto };
+    });
+    const pts = (d.curva || []).filter((c) => c[1] != null);
+    let curvaLinha = '', curvaArea = '', curvaRotulo = 'sem curva ainda';
+    if (pts.length > 1) {
+      const ys = pts.map((c) => c[1]); let lo = Math.min(...ys), hi = Math.max(...ys); if (hi - lo < 1e-6) { lo -= 1; hi += 1; }
+      const X = (i) => (i / (pts.length - 1)) * 600, Y = (v) => 112 - ((v - lo) / (hi - lo)) * 104;
+      curvaLinha = pts.map((c, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(c[1]).toFixed(1)}`).join('');
+      curvaArea = `${curvaLinha}L600 120L0 120Z`;
+      curvaRotulo = `de ${br(ys[0])} a ${br(ys[ys.length - 1])} (${sinal(ys[ys.length - 1] - ys[0])}) · mín ${br(Math.min(...ys))} · máx ${br(Math.max(...ys))}`;
+    }
+    return { erro: '', cards, slots, eventos, curvaLinha, curvaArea, curvaRotulo, alvo: (d.resumo || {}).alvo_incubacao || 30,
+             rodape: `Fonte: ${d.pasta} · roster v${d.roster_versao ?? '—'} de ${d.roster_em || '—'} · book virtual ${book.ativo ? 'ligado' : 'desligado'}, ${book.abertas ?? 0} aberta(s). Só leitura: nada aqui abre, fecha ou muda slot.` };
+  }
   async carregarEmProva() {
     const chaves = (this.state.implantacao?.sets || []).map((s) => s.chave);
     if (!chaves.length) return;
@@ -1239,7 +1370,7 @@ class Component extends DCLogic {
       ? { show: true, text: [p.symbol, p.sistema, p.variante, p.estagio, p.rodada ? `rodada ${p.rodada}` : null, p.finalista_atual ? `finalista ${p.finalista_atual}` : null].filter(Boolean).join(' | '), title: 'atualizado ' + (p.atualizado_em || '') }
       : { show: false, text: '', title: '' };
 
-    const navKeys = [['campanha', L.nav.live], ['configurar', L.nav.setup], ['biblioteca', L.nav.sets], ['portfolios', L.nav.portfolios], ['perfil', L.nav.broker], ['custo', L.nav.nativeCost], ['implantacao', L.nav.implantacao]];
+    const navKeys = [['campanha', L.nav.live], ['aovivo', 'Ao vivo'], ['configurar', L.nav.setup], ['biblioteca', L.nav.sets], ['portfolios', L.nav.portfolios], ['perfil', L.nav.broker], ['custo', L.nav.nativeCost], ['implantacao', L.nav.implantacao]];
     const navItems = navKeys.map(([key, label]) => ({
       key, label, onClick: () => this.setTab(key),
       style: { background: 'none', border: 'none', borderBottom: s.tab === key ? `2px solid ${pal.accent2}` : '2px solid transparent', color: s.tab === key ? pal.accent2 : pal.muted, padding: '12px 16px', cursor: 'pointer', fontSize: '13.5px', whiteSpace: 'nowrap' },
@@ -1512,7 +1643,7 @@ class Component extends DCLogic {
     return {
       pal, L, offline: s.offline, tab: s.tab,
       offlineLabel: this.DEMO ? 'exemplo — backend não conectado' : 'backend não respondeu — mostrando o último dado real',
-      tabCampanha: s.tab === 'campanha', tabConfigurar: s.tab === 'configurar', tabBiblioteca: s.tab === 'biblioteca', tabPortfolios: s.tab === 'portfolios', tabPerfil: s.tab === 'perfil', tabCusto: s.tab === 'custo', tabImplantacao: s.tab === 'implantacao',
+      tabCampanha: s.tab === 'campanha', tabAoVivo: s.tab === 'aovivo', aoVivo: this.montarAoVivo(pal), tabConfigurar: s.tab === 'configurar', tabBiblioteca: s.tab === 'biblioteca', tabPortfolios: s.tab === 'portfolios', tabPerfil: s.tab === 'perfil', tabCusto: s.tab === 'custo', tabImplantacao: s.tab === 'implantacao',
       navItems, familiaItems, familiaLocked, langOptions, locale: s.locale, onChangeLocale: (e) => this.onChangeLocale(e),
       showInstall: s.showInstall, onClickInstall: () => this.clickInstall(),
       badgeMt5Text, badgeMt5Bg, badgeCampanhaText, badgeCampanhaBg, badgeProgresso,
