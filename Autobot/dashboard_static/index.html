@@ -337,6 +337,7 @@
               <th style="text-align:right;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Saldo virtual</th>
               <th style="text-align:right;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Resultado</th>
               <th style="text-align:right;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Abertas (motor / conta)</th>
+              <th style="text-align:left;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Ao vivo × teste</th>
               <th style="text-align:left;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Teste</th>
               <th style="text-align:left;padding:9px 10px;color:{{ pal.muted }};border-bottom:1px solid {{ pal.line }};">Último tick</th>
             </tr></thead>
@@ -352,6 +353,14 @@
                 <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};text-align:right;font-family:'IBM Plex Mono',monospace;">{{ av_s.saldo }}</td>
                 <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ av_s.corNet }};">{{ av_s.net }}</td>
                 <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};text-align:right;font-family:'IBM Plex Mono',monospace;">{{ av_s.abertas }}</td>
+                <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};min-width:150px;" title="{{ av_s.vsTitulo }}">
+                  <div style="position:relative;height:10px;border-radius:5px;background:{{ pal.bg3 }};">
+                    <div style="position:absolute;top:0;height:10px;left:{{ av_s.vsFaixaL }};width:{{ av_s.vsFaixaW }};background:{{ pal.accent2 }};opacity:.35;border-radius:5px;"></div>
+                    <div style="position:absolute;top:-3px;height:16px;width:3px;left:{{ av_s.vsEsp }};background:{{ pal.muted }};"></div>
+                    <div style="position:absolute;top:-3px;height:16px;width:4px;left:{{ av_s.vsReal }};background:{{ av_s.vsCor }};border-radius:2px;"></div>
+                  </div>
+                  <div style="color:{{ pal.muted }};font-size:11px;margin-top:4px;">{{ av_s.vsTexto }}</div>
+                </td>
                 <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};color:{{ pal.muted }};font-size:11.5px;">{{ av_s.teste }}</td>
                 <td style="padding:9px 10px;border-bottom:1px solid {{ pal.line }};color:{{ pal.muted }};font-size:11.5px;white-space:nowrap;">{{ av_s.tick }}</td>
               </tr>
@@ -373,6 +382,150 @@
           </div>
         </div>
         <p style="color:{{ pal.muted }};font-size:11.5px;margin:0;">{{ aoVivo.rodape }}</p>
+      </section>
+    </sc-if>
+
+    <!-- ================= ANALISE ================= -->
+    <sc-if value="{{ tabAnalise }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Análise" style="animation:wrxFade .35s ease both;display:flex;flex-direction:column;gap:16px;">
+        <div style="background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+          <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Funil da campanha</h2>
+          <p style="color:{{ pal.muted }};font-size:12px;margin:0 0 12px;">{{ an.funilSub }}</p>
+          <sc-for list="{{ an.funil }}" as="an_f" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:230px 1fr 110px;gap:12px;align-items:center;margin:5px 0;font-size:12.5px;">
+              <span>{{ an_f.rotulo }}</span>
+              <div style="height:16px;border-radius:5px;background:{{ pal.bg3 }};overflow:hidden;"><div style="height:16px;width:{{ an_f.pct }};background:{{ an_f.cor }};border-radius:5px;"></div></div>
+              <span style="font-family:'IBM Plex Mono',monospace;text-align:right;">{{ an_f.n }} <span style="color:{{ pal.no }};">{{ an_f.caiu }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+          <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Combo</h2>
+          <sc-if value="{{ an.semCombos }}" hint-placeholder-val="{{ false }}">
+            <p style="color:{{ pal.muted }};font-size:12.5px;margin:0;">{{ an.semCombos }}</p>
+          </sc-if>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:150px;overflow-y:auto;">
+            <sc-for list="{{ an.combos }}" as="an_c" hint-placeholder-count="6">
+              <button onClick="{{ an_c.onClick }}" title="{{ an_c.titulo }}" style="{{ an_c.style }}">{{ an_c.rotulo }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ an.msg }}" hint-placeholder-val="{{ false }}">
+          <div style="background:{{ pal.boxGradient }};border-radius:12px;padding:14px 18px;font-size:13px;color:{{ pal.muted }};">{{ an.msg }}</div>
+        </sc-if>
+
+        <sc-if value="{{ an.tem }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <sc-for list="{{ an.cards }}" as="an_k" hint-placeholder-count="8">
+                <div style="background:{{ pal.cardGradient }};border:1px solid {{ pal.line }};border-radius:14px;padding:12px 16px;min-width:120px;flex:1 1 120px;">
+                  <div style="font-size:11px;color:{{ pal.muted }};text-transform:uppercase;letter-spacing:.06em;">{{ an_k.label }}</div>
+                  <b style="display:block;font-size:20px;font-family:'IBM Plex Mono',monospace;margin-top:4px;color:{{ an_k.color }};">{{ an_k.value }}</b>
+                  <div style="font-size:11px;color:{{ pal.muted }};margin-top:2px;">{{ an_k.sub }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+              <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;"><h2 style="font-size:13px;color:{{ pal.muted }};margin:0;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Equity e drawdown (teste de confirmação)</h2><span style="font-size:12px;color:{{ pal.muted }};">{{ an.eqRotulo }}</span></div>
+              <svg viewBox="0 0 600 200" preserveAspectRatio="none" role="img" aria-label="Curva de equity e drawdown" style="width:100%;height:220px;margin-top:10px;display:block;">
+                <line x1="0" x2="600" y1="{{ an.eqZero }}" y2="{{ an.eqZero }}" stroke="{{ pal.line }}" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></line>
+                <path d="{{ an.eqLinha }}" fill="none" stroke="{{ pal.accent2 }}" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+                <path d="{{ an.ddArea }}" fill="{{ pal.no }}" fill-opacity="0.35"></path>
+              </svg>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:{{ pal.muted }};"><span>{{ an.eqIni }}</span><span>drawdown em vermelho, embaixo</span><span>{{ an.eqFim }}</span></div>
+            </div>
+
+            <div style="display:flex;gap:16px;flex-wrap:wrap;">
+              <div style="flex:2 1 420px;background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+                <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Monte Carlo · leque da equity</h2>
+                <p style="color:{{ pal.muted }};font-size:11.5px;margin:0 0 8px;">{{ an.mcSub }}</p>
+                <svg viewBox="0 0 600 200" preserveAspectRatio="none" role="img" aria-label="Leque do Monte Carlo" style="width:100%;height:200px;display:block;">
+                  <line x1="0" x2="600" y1="{{ an.mcZero }}" y2="{{ an.mcZero }}" stroke="{{ pal.line }}" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></line>
+                  <path d="{{ an.mcFaixa90 }}" fill="{{ pal.accent2 }}" fill-opacity="0.13"></path>
+                  <path d="{{ an.mcFaixa50 }}" fill="{{ pal.accent2 }}" fill-opacity="0.25"></path>
+                  <path d="{{ an.mcMediana }}" fill="none" stroke="{{ pal.accent2 }}" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"></path>
+                  <path d="{{ an.mcObs }}" fill="none" stroke="{{ pal.gold }}" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+                </svg>
+                <div style="font-size:11px;color:{{ pal.muted }};margin-top:4px;"><span style="color:{{ pal.gold }};">━</span> sequência real · <span style="color:{{ pal.accent2 }};">┅</span> mediana · faixas 25–75% e 5–95% das reamostras</div>
+              </div>
+              <div style="flex:1 1 280px;background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+                <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Pior drawdown das reamostras</h2>
+                <p style="color:{{ pal.muted }};font-size:11.5px;margin:0 0 8px;">{{ an.histSub }}</p>
+                <svg viewBox="0 0 300 160" role="img" aria-label="Distribuição do pior drawdown" style="width:100%;height:180px;display:block;">
+                  <sc-for list="{{ an.hist }}" as="an_h" hint-placeholder-count="24">
+                    <rect x="{{ an_h.x }}" y="{{ an_h.y }}" width="{{ an_h.w }}" height="{{ an_h.h }}" fill="{{ an_h.cor }}" rx="1"></rect>
+                  </sc-for>
+                  <line x1="{{ an.histObs }}" x2="{{ an.histObs }}" y1="0" y2="150" stroke="{{ pal.gold }}" stroke-width="2"></line>
+                  <line x1="{{ an.histP95 }}" x2="{{ an.histP95 }}" y1="0" y2="150" stroke="{{ pal.no }}" stroke-width="2" stroke-dasharray="4 3"></line>
+                </svg>
+                <div style="font-size:11px;color:{{ pal.muted }};"><span style="color:{{ pal.gold }};">│</span> o que aconteceu · <span style="color:{{ pal.no }};">┆</span> p95 · {{ an.histEixo }}</div>
+              </div>
+            </div>
+
+            <div style="background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+              <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Walk-forward por janela</h2>
+              <p style="color:{{ pal.muted }};font-size:11.5px;margin:0 0 10px;">{{ an.wfaSub }}</p>
+              <sc-if value="{{ an.wfaTem }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:10px;align-items:flex-end;height:170px;padding:0 4px;border-bottom:1px solid {{ pal.line }};">
+                  <sc-for list="{{ an.wfa }}" as="an_w" hint-placeholder-count="6">
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;" title="{{ an_w.titulo }}">
+                      <span style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:{{ an_w.corWfe }};">{{ an_w.wfe }}</span>
+                      <div style="display:flex;gap:3px;align-items:flex-end;height:130px;">
+                        <div style="width:18px;height:{{ an_w.hIs }};background:{{ pal.muted }};opacity:.55;border-radius:3px 3px 0 0;"></div>
+                        <div style="width:18px;height:{{ an_w.hOos }};background:{{ an_w.corOos }};border-radius:3px 3px 0 0;"></div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;gap:10px;padding:4px 4px 0;">
+                  <sc-for list="{{ an.wfa }}" as="an_w2" hint-placeholder-count="6">
+                    <span style="flex:1;text-align:center;font-size:11px;color:{{ pal.muted }};">{{ an_w2.rotulo }}</span>
+                  </sc-for>
+                </div>
+                <div style="font-size:11px;color:{{ pal.muted }};margin-top:6px;">cinza = lucro/dia dentro da amostra (otimizado) · cor = lucro/dia fora da amostra · número = eficiência (WFE)</div>
+              </sc-if>
+            </div>
+
+            <div style="background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+              <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Resultado por mês</h2>
+              <div style="overflow-x:auto;">
+                <div style="display:grid;grid-template-columns:52px repeat(12,minmax(44px,1fr)) 80px;gap:3px;font-size:11px;min-width:720px;">
+                  <span></span>
+                  <sc-for list="{{ an.meses }}" as="an_m" hint-placeholder-count="12"><span style="text-align:center;color:{{ pal.muted }};">{{ an_m }}</span></sc-for>
+                  <span style="text-align:right;color:{{ pal.muted }};">ano</span>
+                </div>
+                <sc-for list="{{ an.anos }}" as="an_a" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:52px repeat(12,minmax(44px,1fr)) 80px;gap:3px;font-size:11px;margin-top:3px;min-width:720px;">
+                    <b style="align-self:center;">{{ an_a.ano }}</b>
+                    <sc-for list="{{ an_a.cel }}" as="an_x" hint-placeholder-count="12">
+                      <span title="{{ an_x.titulo }}" style="background:{{ an_x.bg }};color:{{ an_x.fg }};border-radius:4px;padding:6px 2px;text-align:center;font-family:'IBM Plex Mono',monospace;">{{ an_x.txt }}</span>
+                    </sc-for>
+                    <b style="align-self:center;text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ an_a.cor }};">{{ an_a.total }}</b>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="background:{{ pal.boxGradient }};border-radius:16px;padding:18px 22px;box-shadow:{{ pal.shadowCard }};">
+          <h2 style="font-size:13px;color:{{ pal.muted }};margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Correlação entre combos</h2>
+          <p style="color:{{ pal.muted }};font-size:11.5px;margin:0 0 10px;">{{ an.corrSub }}</p>
+          <div style="overflow-x:auto;">
+            <sc-for list="{{ an.corr }}" as="an_r" hint-placeholder-count="4">
+              <div style="display:flex;gap:3px;margin-top:3px;align-items:center;">
+                <span style="width:230px;flex-shrink:0;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="{{ an_r.nome }}">{{ an_r.nome }}</span>
+                <sc-for list="{{ an_r.cel }}" as="an_rc" hint-placeholder-count="4">
+                  <span title="{{ an_rc.titulo }}" style="width:46px;flex-shrink:0;background:{{ an_rc.bg }};color:{{ an_rc.fg }};border-radius:4px;padding:6px 0;text-align:center;font-size:11px;font-family:'IBM Plex Mono',monospace;">{{ an_rc.txt }}</span>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <p style="color:{{ pal.muted }};font-size:11.5px;margin:0;">Fonte: relatório de confirmação arquivado de cada combo (campanha_relatorios) e o WFA de wfa_real.py, nesta máquina. Valores em dinheiro do depósito do teste. Só leitura.</p>
       </section>
     </sc-if>
 
@@ -945,6 +1098,7 @@ class Component extends DCLogic {
     if (tab === 'portfolios') this.carregarPortfolios();
     if (tab === 'custo') this.carregarCusto();
     if (tab === 'aovivo') this.carregarAoVivo();
+    if (tab === 'analise') this.carregarAnalise();
     if (tab === 'implantacao') { this.carregarImplantacao().then(() => this.carregarEmProva()); this.carregarSugestoes(); }
   }
   setFamilia(f) {
@@ -1214,6 +1368,17 @@ class Component extends DCLogic {
         abertas: `${x.abertas_motor ?? '—'} / ${x.abertas_terminal ?? '—'}` + (x.orfas ? ` · ${x.orfas} órfã` : '') + (x.vetados ? ` · ${x.vetados} veto` : ''),
         teste: [t.nota, t.p_bruto != null ? `p bruto ${br(t.p_bruto, 4)}` : null, t.n_oos != null ? `${t.n_oos} OOS` : null, nv.lucro != null ? `nunca visto ${sinal(nv.lucro)}` : null, t.dd_3anos_pct != null ? `DD 3a ${br(t.dd_3anos_pct, 1)}%` : null].filter(Boolean).join(' · ') || '—',
         tick: idade(x.idade_tick_s),
+        ...(() => {
+          const v = x.vs_teste || {}; const vazio = { vsFaixaL: '0%', vsFaixaW: '0%', vsEsp: '50%', vsReal: '50%', vsCor: pal.muted };
+          if (!v.n) return { ...vazio, vsTexto: v.esperado_por_trade != null ? `sem trade ainda · teste ${sinal(v.esperado_por_trade)}/trade` : 'sem trade ainda', vsTitulo: '' };
+          const pts2 = [v.real, v.esperado, v.p5, v.p95, 0].filter((z) => z != null); const a = Math.min(...pts2), b = Math.max(...pts2), span = Math.max(1e-9, b - a);
+          const P = (z) => `${Math.max(0, Math.min(97, ((z - a) / span) * 97))}%`;
+          const temFaixa = v.p5 != null;
+          return { vsFaixaL: temFaixa ? P(v.p5) : '0%', vsFaixaW: temFaixa ? `${Math.max(2, ((v.p95 - v.p5) / span) * 97)}%` : '0%',
+            vsEsp: v.esperado != null ? P(v.esperado) : '50%', vsReal: P(v.real ?? 0), vsCor: v.fora ? pal.no : (v.real || 0) >= (v.esperado || 0) ? pal.ok : pal.gold,
+            vsTexto: `${v.n} trade(s): real ${sinal(v.real)} · teste ${sinal(v.esperado)}` + (temFaixa ? (v.fora ? ' · FORA da faixa' : ' · dentro da faixa') : ''),
+            vsTitulo: temFaixa ? `Faixa 5–95% do teste para ${v.n} trades: ${br(v.p5)} a ${br(v.p95)} (bootstrap dos trades do relatório).` : `Ritmo do dado nunca visto do teste: ${sinal(v.esperado_por_trade)} por trade. Sem relatório nesta máquina, sem faixa.` };
+        })(),
       };
     });
     const COR_EV = { abrir: pal.ok, fechar: pal.accent2, sem_ticks: pal.gold, slot_rebase: pal.muted };
@@ -1225,7 +1390,7 @@ class Component extends DCLogic {
     const pts = (d.curva || []).filter((c) => c[1] != null);
     let curvaLinha = '', curvaArea = '', curvaRotulo = 'sem curva ainda';
     if (pts.length > 1) {
-      const ys = pts.map((c) => c[1]); let lo = Math.min(...ys), hi = Math.max(...ys); if (hi - lo < 1e-6) { lo -= 1; hi += 1; }
+      const ys = pts.map((c) => c[1]); let lo = Math.min(...ys), hi = Math.max(...ys); const piso = Math.max(1, Math.abs(ys[ys.length - 1]) * 0.002); if (hi - lo < piso) { const m = (hi + lo) / 2; lo = m - piso / 2; hi = m + piso / 2; }
       const X = (i) => (i / (pts.length - 1)) * 600, Y = (v) => 112 - ((v - lo) / (hi - lo)) * 104;
       curvaLinha = pts.map((c, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(c[1]).toFixed(1)}`).join('');
       curvaArea = `${curvaLinha}L600 120L0 120Z`;
@@ -1233,6 +1398,112 @@ class Component extends DCLogic {
     }
     return { erro: '', cards, slots, eventos, curvaLinha, curvaArea, curvaRotulo, alvo: (d.resumo || {}).alvo_incubacao || 30,
              rodape: `Fonte: ${d.pasta} · roster v${d.roster_versao ?? '—'} de ${d.roster_em || '—'} · book virtual ${book.ativo ? 'ligado' : 'desligado'}, ${book.abertas ?? 0} aberta(s). Só leitura: nada aqui abre, fecha ou muda slot.` };
+  }
+  async carregarAnalise() {
+    try {
+      const [c, k] = await Promise.all([this.getReal('/api/analise/combos'), this.getReal('/api/analise/correlacao')]);
+      this.setState({ anCombos: c, anCorr: k });
+      const sel = this.state.anSel || (c.combos || [])[0];
+      if (sel) this.selecionarAnalise(sel);
+    } catch (e) { this.setState({ anCombos: { combos: [], erro: 'Sem resposta do painel.' } }); }
+  }
+  async selecionarAnalise(c) {
+    this.setState({ anSel: c, anDados: null });
+    try {
+      const d = await this.getReal(`/api/analise/${encodeURIComponent(c.relatorio_dir)}?chave=${encodeURIComponent(c.chave)}`);
+      this.setState({ anDados: d });
+    } catch (e) { this.setState({ anDados: { ok: false, erro: 'relatório sem trades legíveis nesta máquina' } }); }
+  }
+  montarAnalise(pal) {
+    const br = (v, n = 0) => v == null ? '—' : Number(v).toLocaleString('pt-BR', { minimumFractionDigits: n, maximumFractionDigits: n });
+    const sinal = (v, n = 0) => v == null ? '—' : (v > 0 ? '+' : '') + br(v, n);
+    const cl = this.state.anCombos, d = this.state.anDados, sel = this.state.anSel;
+    const out = { funil: [], funilSub: 'Carregando…', combos: [], semCombos: '', msg: '', tem: false, cards: [], hist: [], wfa: [], wfaTem: false, anos: [],
+      meses: ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'], corr: [], corrSub: 'Carregando…' };
+    if (!cl) return out;
+    const f = cl.funil || { etapas: [] }, topo = Math.max(1, ...(f.etapas || []).map((e) => e.n || 0));
+    out.funil = (f.etapas || []).map((e, i, arr) => ({ rotulo: e.rotulo, n: br(e.n), caiu: e.caiu ? `−${e.caiu}` : '', pct: `${Math.max(e.n ? 1.5 : 0, (100 * (e.n || 0)) / topo)}%`,
+      cor: i >= arr.length - 2 ? pal.ok : pal.accent2 }));
+    out.funilSub = f.total ? `${f.total} combos no ledger (a última corrida de cada um); ${f.aprovados} aprovados. O número em vermelho é quantos caíram naquela etapa.` : 'Ledger vazio nesta máquina (a campanha roda na máquina de treino).';
+    out.combos = (cl.combos || []).map((c) => {
+      const ativo = sel && sel.chave === c.chave;
+      return { rotulo: (c.ao_vivo ? '● ' : c.aprovado ? '✓ ' : '') + c.chave.replace(/__/g, ' · ').replace(/_/g, ' '), titulo: c.ao_vivo ? 'no live' : c.aprovado ? 'aprovado' : `reprovado em ${c.reprovado_em || '?'}`,
+        onClick: () => this.selecionarAnalise(c),
+        style: `background:${ativo ? pal.accent2 : pal.bg3};color:${ativo ? pal.bg : pal.text};border:1px solid ${c.ao_vivo ? pal.ok : pal.line};border-radius:8px;padding:5px 10px;font-size:11.5px;cursor:pointer;font-weight:${ativo ? 700 : 400};` };
+    });
+    if (!out.combos.length) out.semCombos = cl.erro || 'Nenhum combo com relatório arquivado nesta máquina. Os relatórios ficam na máquina de treino (campanha_relatorios/); abra este painel lá para ver os gráficos.';
+    const k = this.state.anCorr && this.state.anCorr.correlacao;
+    if (k) {
+      const curto = (n) => n.split('__').slice(0, 2).join(' ').replace(/_/g, ' ');
+      out.corr = [{ nome: '', cel: k.nomes.map((n, j) => ({ txt: String(j + 1), titulo: n, bg: 'transparent', fg: pal.muted })) }].concat(
+        k.matriz.map((linha, i) => ({ nome: `${i + 1}. ${curto(k.nomes[i])}`, cel: linha.map((v, j) => {
+          const a = v == null ? 0 : Math.min(1, Math.abs(v));
+          return { txt: v == null ? '—' : br(v, 2), titulo: `${k.nomes[i]} × ${k.nomes[j]}`, bg: i === j ? pal.bg3 : v >= 0 ? `rgba(220,90,90,${0.12 + a * 0.7})` : `rgba(80,170,220,${0.12 + a * 0.7})`, fg: pal.text };
+        }) })));
+      out.corrSub = `Correlação do resultado diário em ${k.dias} dias (${this.state.anCorr.base}). Vermelho forte = perdem juntos (risco somado); azul = se compensam.`;
+    } else out.corrSub = 'Precisa de 2 ou mais combos com relatório nesta máquina.';
+    if (!sel) return out;
+    if (!d) { out.msg = `Carregando ${sel.chave}…`; return out; }
+    if (!d.ok) { out.msg = `${sel.chave}: ${d.erro}`; return out; }
+    out.tem = true;
+    const c = d.curva, mc = d.monte_carlo, w = d.wfa;
+    out.cards = [
+      { label: 'Trades', value: br(c.n), sub: `${br(c.win_rate, 1)}% vencedores`, color: pal.text },
+      { label: 'Resultado', value: sinal(c.lucro), sub: `média ${sinal(c.media, 2)}/trade`, color: c.lucro >= 0 ? pal.ok : pal.no },
+      { label: 'Profit factor', value: c.profit_factor == null ? '—' : br(c.profit_factor, 2), sub: 'ganho ÷ perda', color: (c.profit_factor || 0) >= 1.3 ? pal.ok : pal.gold },
+      { label: 'Drawdown máx', value: br(c.dd_max), sub: 'na sequência real', color: pal.no },
+      { label: 'DD p95 (MC)', value: mc ? br(-mc.dd_p95) : '—', sub: mc ? `${br(mc.dd_p95 / Math.max(1, Math.abs(c.dd_max)), 1)}× o real` : 'poucos trades', color: pal.no },
+      { label: 'Chance de prejuízo', value: mc ? `${br(mc.prob_prejuizo * 100, 1)}%` : '—', sub: `em ${mc ? br(mc.n) : 0} reamostras`, color: mc && mc.prob_prejuizo > 0.05 ? pal.no : pal.ok },
+      { label: 'WFE', value: w && w.wfe_global_pct != null ? `${br(w.wfe_global_pct)}%` : '—', sub: w ? `${w.ciclos_positivos || '—'} janelas positivas` : 'WFA não rodou', color: w && (w.wfe_global_pct || 0) >= 50 ? pal.ok : pal.gold },
+    ];
+    // equity (topo, 0-130) e drawdown (base, 140-200)
+    const eq = c.equity, dd = c.dd, nP = eq.length;
+    const X = (i) => (nP < 2 ? 0 : (i / (nP - 1)) * 600);
+    let lo = Math.min(0, ...eq), hi = Math.max(0, ...eq); if (hi - lo < 1e-9) hi = lo + 1;
+    const Ye = (v) => 126 - ((v - lo) / (hi - lo)) * 120;
+    out.eqLinha = eq.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Ye(v).toFixed(1)}`).join('');
+    out.eqZero = Ye(0).toFixed(1);
+    const ddMin = Math.min(-1e-9, ...dd), Yd = (v) => 140 + (v / ddMin) * 58;
+    out.ddArea = `M0 140${dd.map((v, i) => `L${X(i).toFixed(1)} ${Yd(v).toFixed(1)}`).join('')}L600 140Z`;
+    out.eqIni = c.t[0]; out.eqFim = c.t[nP - 1];
+    out.eqRotulo = `${sinal(c.lucro)} em ${br(c.n)} trades · pior queda ${br(c.dd_max)}`;
+    if (mc) {
+      const todos = [].concat(mc.p5, mc.p95, mc.observada, [0]); let a = Math.min(...todos), b = Math.max(...todos); if (b - a < 1e-9) b = a + 1;
+      const n = mc.x.length, Xm = (i) => (n < 2 ? 0 : (i / (n - 1)) * 600), Ym = (v) => 194 - ((v - a) / (b - a)) * 188;
+      const linha = (arr) => arr.map((v, i) => `${i ? 'L' : 'M'}${Xm(i).toFixed(1)} ${Ym(v).toFixed(1)}`).join('');
+      const faixa = (lo2, hi2) => `${linha(hi2)}${lo2.map((v, i) => `L${Xm(n - 1 - i).toFixed(1)} ${Ym(lo2[n - 1 - i]).toFixed(1)}`).join('')}Z`;
+      out.mcFaixa90 = faixa(mc.p5, mc.p95); out.mcFaixa50 = faixa(mc.p25, mc.p75); out.mcMediana = linha(mc.p50); out.mcObs = linha(mc.observada); out.mcZero = Ym(0).toFixed(1);
+      out.mcSub = `${br(mc.n)} reamostras com reposição dos ${br(mc.trades)} trades. Ao fim: 90% entre ${sinal(mc.final_p5)} e ${sinal(mc.final_p95)}.`;
+      const cont = mc.dd_hist.contagem, bord = mc.dd_hist.bordas, mx = Math.max(1, ...cont), bw = 300 / cont.length;
+      const Xh = (v) => Math.max(0, Math.min(300, ((v - bord[0]) / Math.max(1e-9, bord[bord.length - 1] - bord[0])) * 300));
+      out.hist = cont.map((v, i) => ({ x: (i * bw + 0.5).toFixed(1), w: Math.max(1, bw - 1).toFixed(1), h: ((v / mx) * 148).toFixed(1), y: (150 - (v / mx) * 148).toFixed(1), cor: bord[i] >= mc.dd_p95 ? pal.no : pal.accent2 }));
+      out.histObs = Xh(mc.dd_observado).toFixed(1); out.histP95 = Xh(mc.dd_p95).toFixed(1);
+      out.histEixo = `de ${br(bord[0])} a ${br(bord[bord.length - 1])}`;
+      out.histSub = `Mediana ${br(mc.dd_p50)}; em 95% das ordens possíveis a queda não passa de ${br(mc.dd_p95)}. O real foi ${br(mc.dd_observado)}.`;
+    } else { out.mcSub = 'Menos de 5 trades: sem Monte Carlo.'; out.histSub = ''; }
+    if (w && (w.janelas || []).length) {
+      const porDia = (j, lado) => { const v = lado === 'is' ? j.lucro_is : j.lucro_oos, dias = lado === 'is' ? w.is_dias : w.oos_dias; return v == null || !dias ? null : v / dias; };
+      const mx = Math.max(1e-9, ...w.janelas.flatMap((j) => [Math.abs(porDia(j, 'is') || 0), Math.abs(porDia(j, 'oos') || 0)]));
+      out.wfa = w.janelas.map((j) => {
+        const pi = porDia(j, 'is'), po = porDia(j, 'oos');
+        return { rotulo: `J${j.janela}`, hIs: `${Math.max(2, (Math.abs(pi || 0) / mx) * 126)}px`, hOos: `${Math.max(2, (Math.abs(po || 0) / mx) * 126)}px`,
+          corOos: po == null ? pal.muted : po >= 0 ? pal.ok : pal.no, wfe: j.wfe_pct == null ? (j.motivo ? 'sem IS' : '—') : `${br(j.wfe_pct)}%`,
+          corWfe: (j.wfe_pct || 0) >= 50 ? pal.ok : pal.gold,
+          titulo: j.motivo || `IS ${(j.is || []).join('→')}: ${sinal(j.lucro_is)} · OOS ${(j.oos || []).join('→')}: ${sinal(j.lucro_oos)}` };
+      });
+      out.wfaTem = true;
+      out.wfaSub = `${w.janelas.length} janelas de ${w.is_dias} dias otimizando e ${w.oos_dias} dias operando sem mexer. WFE global ${w.wfe_global_pct == null ? '—' : br(w.wfe_global_pct) + '%'} (≥ 50% é bom), ${w.ciclos_positivos || '—'} positivas. Barra negativa também sobe: a cor diz o sinal.`;
+    } else out.wfaSub = 'Este combo ainda não passou pelo WFA real (python wfa_real.py --symbol … --sistema …).';
+    const m = d.mensal, mxm = Math.max(1e-9, m.max_abs || 0);
+    out.anos = Object.entries(m.anos).map(([ano, vals]) => {
+      const tot = vals.reduce((s, v) => s + (v || 0), 0);
+      return { ano, total: sinal(tot), cor: tot >= 0 ? pal.ok : pal.no, cel: vals.map((v, i) => {
+        const a = v == null ? 0 : Math.min(1, Math.abs(v) / mxm);
+        return { txt: v == null ? '' : sinal(v), titulo: `${out.meses[i]}/${ano}: ${v == null ? 'sem trade' : sinal(v, 2)}`,
+          bg: v == null ? pal.bg3 : v >= 0 ? `rgba(70,190,120,${0.15 + a * 0.75})` : `rgba(225,85,85,${0.15 + a * 0.75})`, fg: pal.text };
+      }) };
+    });
+    return out;
   }
   async carregarEmProva() {
     const chaves = (this.state.implantacao?.sets || []).map((s) => s.chave);
@@ -1370,7 +1641,7 @@ class Component extends DCLogic {
       ? { show: true, text: [p.symbol, p.sistema, p.variante, p.estagio, p.rodada ? `rodada ${p.rodada}` : null, p.finalista_atual ? `finalista ${p.finalista_atual}` : null].filter(Boolean).join(' | '), title: 'atualizado ' + (p.atualizado_em || '') }
       : { show: false, text: '', title: '' };
 
-    const navKeys = [['campanha', L.nav.live], ['aovivo', 'Ao vivo'], ['configurar', L.nav.setup], ['biblioteca', L.nav.sets], ['portfolios', L.nav.portfolios], ['perfil', L.nav.broker], ['custo', L.nav.nativeCost], ['implantacao', L.nav.implantacao]];
+    const navKeys = [['campanha', L.nav.live], ['aovivo', 'Ao vivo'], ['analise', 'Análise'], ['configurar', L.nav.setup], ['biblioteca', L.nav.sets], ['portfolios', L.nav.portfolios], ['perfil', L.nav.broker], ['custo', L.nav.nativeCost], ['implantacao', L.nav.implantacao]];
     const navItems = navKeys.map(([key, label]) => ({
       key, label, onClick: () => this.setTab(key),
       style: { background: 'none', border: 'none', borderBottom: s.tab === key ? `2px solid ${pal.accent2}` : '2px solid transparent', color: s.tab === key ? pal.accent2 : pal.muted, padding: '12px 16px', cursor: 'pointer', fontSize: '13.5px', whiteSpace: 'nowrap' },
@@ -1643,7 +1914,7 @@ class Component extends DCLogic {
     return {
       pal, L, offline: s.offline, tab: s.tab,
       offlineLabel: this.DEMO ? 'exemplo — backend não conectado' : 'backend não respondeu — mostrando o último dado real',
-      tabCampanha: s.tab === 'campanha', tabAoVivo: s.tab === 'aovivo', aoVivo: this.montarAoVivo(pal), tabConfigurar: s.tab === 'configurar', tabBiblioteca: s.tab === 'biblioteca', tabPortfolios: s.tab === 'portfolios', tabPerfil: s.tab === 'perfil', tabCusto: s.tab === 'custo', tabImplantacao: s.tab === 'implantacao',
+      tabCampanha: s.tab === 'campanha', tabAoVivo: s.tab === 'aovivo', aoVivo: this.montarAoVivo(pal), tabAnalise: s.tab === 'analise', an: this.montarAnalise(pal), tabConfigurar: s.tab === 'configurar', tabBiblioteca: s.tab === 'biblioteca', tabPortfolios: s.tab === 'portfolios', tabPerfil: s.tab === 'perfil', tabCusto: s.tab === 'custo', tabImplantacao: s.tab === 'implantacao',
       navItems, familiaItems, familiaLocked, langOptions, locale: s.locale, onChangeLocale: (e) => this.onChangeLocale(e),
       showInstall: s.showInstall, onClickInstall: () => this.clickInstall(),
       badgeMt5Text, badgeMt5Bg, badgeCampanhaText, badgeCampanhaBg, badgeProgresso,
