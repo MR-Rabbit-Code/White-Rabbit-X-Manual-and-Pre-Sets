@@ -69,6 +69,8 @@ import ready_library
 import relatorio_resumo
 import auto_manager_live
 import em_prova
+import ao_vivo_receptor
+import analise_wrx
 import wrx_paths
 from generate_system_sets import ASSETS, CLASSES, SYSTEMS
 from mt5_runner import fechar_terminal, terminal_aberto
@@ -1417,6 +1419,57 @@ def implantacao_sugestoes(saldo: float = 0.0) -> JSONResponse:
         "pool": len(disponiveis),
         "com_serie": len(series),
     })
+
+
+def _relatorio_por_chave() -> dict[str, str]:
+    return {c: r["relatorio_dir"] for c, r in analise_wrx.ultima_por_combo(ler_ledger()).items()
+            if r.get("relatorio_dir") and analise_wrx.nome_seguro(r["relatorio_dir"])}
+
+
+@app.get("/api/ao_vivo")
+def ao_vivo() -> JSONResponse:
+    """Aba "Ao vivo": o receptor (slots na conta demo + book virtual), lido de `_execucao/WhiteRabbit`. So le.
+    Cada slot ganha `vs_teste`: o resultado ao vivo contra a faixa do teste para o mesmo numero de trades."""
+    dados = ao_vivo_receptor.carregar()
+    if dados.get("ok"):
+        rel = _relatorio_por_chave()
+        for s in dados["slots"]:
+            rd = rel.get(s.get("id"))
+            trades = (analise_wrx.trades_do_relatorio(RELATORIOS_DIR / rd / "conf_wrx.htm")
+                      if rd and s.get("fechados") else None)
+            s["vs_teste"] = analise_wrx.ao_vivo_vs_teste(s, trades)
+    return JSONResponse(dados)
+
+
+def _vivos() -> set[str]:
+    d = ao_vivo_receptor.carregar()
+    return {s["id"] for s in d.get("slots") or [] if s.get("estado") != "off"} if d.get("ok") else set()
+
+
+@app.get("/api/analise/combos")
+def analise_combos() -> JSONResponse:
+    """Combos com relatorio arquivado nesta maquina (para o seletor da aba Analise) + o funil da campanha."""
+    ledger = ler_ledger()
+    vivos = _vivos()
+    return JSONResponse({"combos": analise_wrx.combos(ledger, vivos, RELATORIOS_DIR),
+                         "funil": analise_wrx.funil(ledger, _carregar_implantados(), vivos)})
+
+
+@app.get("/api/analise/correlacao")
+def analise_correlacao() -> JSONResponse:
+    """Correlacao diaria entre os combos no live (ou, sem live aqui, os aprovados)."""
+    cs = analise_wrx.combos(ler_ledger(), _vivos(), RELATORIOS_DIR)
+    alvo = [c for c in cs if c["ao_vivo"]] or [c for c in cs if c["aprovado"]]
+    itens = [(c["chave"], RELATORIOS_DIR / c["relatorio_dir"] / "conf_wrx.htm") for c in alvo]
+    return JSONResponse({"correlacao": analise_wrx.correlacao(itens),
+                         "base": "ao vivo" if any(c["ao_vivo"] for c in cs) else "aprovados"})
+
+
+@app.get("/api/analise/{relatorio_dir}")
+def analise_combo(relatorio_dir: str, chave: str = "") -> JSONResponse:
+    """Equity e drawdown, leque do Monte Carlo, WFA por janela e retorno mensal de um combo. Sob demanda."""
+    r = analise_wrx.analisar(relatorio_dir, chave or None, RELATORIOS_DIR)
+    return JSONResponse(r, status_code=200 if r.get("ok") else 404)
 
 
 @app.get("/api/implantacao/em_prova")
