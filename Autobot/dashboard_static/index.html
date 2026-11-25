@@ -1341,19 +1341,36 @@ class Component extends DCLogic {
   montarAoVivo(pal) {
     const d = this.state.aoVivoDados;
     const vazio = { erro: '', cards: [], slots: [], eventos: [], curvaLinha: '', curvaArea: '', curvaRotulo: '', alvo: 30, rodape: '' };
+    const contagemPacote = (v) => Number.isInteger(v) && v >= 0 ? String(v) : '—';
+    const cartaoPacote = (p) => {
+      const partes = p.partes || {};
+      return {
+        label: 'Último pacote aplicado',
+        value: p.estado === 'confirmado' ? `v${p.versao}` : 'sem confirmação',
+        sub: p.estado === 'confirmado'
+          ? `${p.aplicado_em} · campeões ${contagemPacote(partes.campeoes)} · incubação ${contagemPacote(partes.incubacao)} · candidatos ${contagemPacote(partes.candidatos)} (não ativos)`
+          : p.estado === 'invalido' ? 'aplicado.json inválido; estado desconhecido' : 'sem aplicado.json nesta máquina',
+        color: p.estado === 'confirmado' ? pal.ok : p.estado === 'invalido' ? pal.no : pal.gold,
+      };
+    };
     if (!d) return Object.assign(vazio, { rodape: 'Carregando o receptor…' });
-    if (!d.ok) return Object.assign(vazio, { erro: d.erro || 'Receptor indisponível.' });
+    if (!d.ok) return Object.assign(vazio, {
+      erro: d.erro || 'Receptor indisponível.',
+      cards: d.pacote_aplicado ? [cartaoPacote(d.pacote_aplicado)] : [],
+    });
     const r = d.resumo || {}, br = (v, n = 2) => v == null ? '—' : Number(v).toLocaleString('pt-BR', { minimumFractionDigits: n, maximumFractionDigits: n });
     const sinal = (v) => v == null ? '—' : (v > 0 ? '+' : '') + br(v);
     const FORMA = { ok: '●', warn: '▲', bad: '✕', off: '○' }, COR = { ok: pal.ok, warn: pal.gold, bad: pal.no, off: pal.muted };
     const idade = (s) => s == null ? '—' : s < 90 ? `há ${Math.round(s)} s` : s < 5400 ? `há ${Math.round(s / 60)} min` : `há ${(s / 3600).toFixed(1).replace('.', ',')} h`;
     const conta = d.conta || {}, book = d.book || {};
+    const pacote = d.pacote_aplicado || {};
     const cards = [
       { label: 'Slots rodando', value: `${r.rodando || 0}/${r.slots || 0}`, sub: (r.atencao ? `${r.atencao} em atenção` : 'nenhum em atenção') + (r.incubando ? ` · ${r.incubando} incubando` : ''), color: r.atencao ? pal.gold : pal.ok },
       { label: 'Resultado virtual', value: sinal(r.net_virtual), sub: `${r.fechados || 0} trades fechados`, color: (r.net_virtual || 0) >= 0 ? pal.ok : pal.no },
       { label: 'Posições na conta', value: String(r.abertas || 0), sub: r.orfas ? `${r.orfas} órfã(s)!` : 'nenhuma órfã', color: r.orfas ? pal.no : pal.text },
       { label: 'Conta demo', value: br(conta.equity, 0), sub: `${conta.login || '—'} · ${conta.servidor || ''}`, color: pal.text },
       { label: 'Retrato', value: idade(d.idade_s), sub: d.retrato_velho ? 'receptor parado?' : `modo ${d.modo || '—'}${d.somente_demo ? ' · só demo' : ''}`, color: d.retrato_velho ? pal.no : pal.text },
+      cartaoPacote(pacote),
     ];
     const slots = (d.slots || []).map((x) => {
       const t = x.teste || {}, nv = t.nunca_visto || {};
