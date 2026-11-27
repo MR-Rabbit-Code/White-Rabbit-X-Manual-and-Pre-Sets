@@ -32,6 +32,24 @@ def test_sem_receptor_diz_onde_procurou(tmp_path):
     assert r["ok"] is False and "status.json" in r["erro"]
 
 
+def test_recibo_de_aplicacao_independe_do_status_do_receptor(tmp_path):
+    base = tmp_path / "WhiteRabbit"
+    aplicado = base.parent / "troca" / "whiterabbit" / "aplicado.json"
+    aplicado.parent.mkdir(parents=True)
+    aplicado.write_text(json.dumps({
+        "sistema": "whiterabbit",
+        "versao": 42,
+        "aplicado_em": "2026-11-24T12:00:00Z",
+        "partes": {"campeoes": 8, "incubacao": 3, "candidatos": 5},
+    }), encoding="utf-8")
+
+    r = A.carregar(AGORA, base)
+
+    assert r["ok"] is False
+    assert r["pacote_aplicado"]["estado"] == "confirmado"
+    assert r["pacote_aplicado"]["versao"] == 42
+
+
 def test_junta_roster_eventos_e_curva(tmp_path):
     roster = {"versao": 7, "slots": [{"id": "EURJPY__03", "vivo_desde": "2026-11-16", "incubacao_fase": "coletando",
                                       "motor": {"p": 1.0, "p_bruto": 0.0199, "n_oos": 40, "nota": "FRACA", "nunca_visto": {"lucro": 10, "trades": 40}}}]}
@@ -44,6 +62,47 @@ def test_junta_roster_eventos_e_curva(tmp_path):
     assert s["teste"]["p_bruto"] == 0.0199 and s["vivo_desde"] == "2026-11-16"
     assert len(r["eventos"]) == 1 and len(r["curva"]) == 2 and r["retrato_velho"] is False
     assert r["resumo"]["net_virtual"] == 10.0
+
+
+def test_confirma_pacote_aplicado_e_mantem_candidatos_separados(tmp_path):
+    base = montar(tmp_path / "WhiteRabbit", [slot()])
+    aplicado = base.parent / "troca" / "whiterabbit" / "aplicado.json"
+    aplicado.parent.mkdir(parents=True)
+    aplicado.write_text(json.dumps({
+        "sistema": "whiterabbit",
+        "versao": 42,
+        "aplicado_em": "2026-11-24T12:00:00Z",
+        "partes": {"campeoes": 8, "incubacao": 3, "candidatos": 5},
+    }), encoding="utf-8")
+
+    r = A.carregar(AGORA, base)
+
+    assert r["pacote_aplicado"] == {
+        "estado": "confirmado",
+        "versao": 42,
+        "aplicado_em": "2026-11-24T12:00:00Z",
+        "partes": {"campeoes": 8, "incubacao": 3, "candidatos": 5},
+    }
+    assert r["resumo"]["slots"] == 1
+    assert r["pacote_aplicado"]["partes"]["candidatos"] == 5
+
+
+def test_aplicacao_ausente_ou_com_schema_invalido_nao_confirma_pacote(tmp_path):
+    base = montar(tmp_path / "WhiteRabbit", [slot()])
+    assert A.carregar(AGORA, base)["pacote_aplicado"] == {"estado": "ausente"}
+
+    aplicado = base.parent / "troca" / "whiterabbit" / "aplicado.json"
+    aplicado.parent.mkdir(parents=True)
+    aplicado.write_text(json.dumps({
+        "sistema": "whiterabbit",
+        "versao": 42,
+        "aplicado_em": "2026-11-24T12:00:00Z",
+        "partes": {"campeoes": 8, "incubacao": 3},
+    }), encoding="utf-8")
+
+    assert A.carregar(AGORA, base)["pacote_aplicado"] == {
+        "estado": "invalido", "motivo": "schema_invalido"
+    }
 
 
 def test_estados_do_slot(tmp_path):

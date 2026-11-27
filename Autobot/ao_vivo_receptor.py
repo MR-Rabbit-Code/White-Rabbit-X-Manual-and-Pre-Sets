@@ -7,6 +7,7 @@ O live do White Rabbit e o RECEPTOR (motor WRX replicando os slots na conta demo
   receptor/eventos-AAAAMMDD.jsonl  abrir / fechar / slot_rebase / sem_ticks ...
   receptor/virtual/curva.jsonl  equity do book virtual minuto a minuto
   live/slots.json               o roster: por slot, capital, incubacao, desde quando, e a medida do motor (p, n_oos, nota, nunca visto)
+  ../troca/whiterabbit/aplicado.json  recibo do pacote aplicado, com versao e contagem de campeoes/incubacao/candidatos
 Este modulo so LE e junta tudo num JSON para o painel. Nunca escreve no receptor nem fala com o MT5.
 Onde procura: `WRX_RECEPTOR_DIR` (pasta `_execucao/WhiteRabbit`), senao `<raiz>/_execucao/WhiteRabbit` (raiz = pasta acima do repo).
 """
@@ -57,6 +58,36 @@ def _num(v):
     return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else None
 
 
+def _pacote_aplicado(base: Path) -> dict:
+    caminho = base.parent / "troca" / "whiterabbit" / "aplicado.json"
+    try:
+        d = json.loads(caminho.read_text(encoding="utf-8-sig"))
+    except FileNotFoundError:
+        return {"estado": "ausente"}
+    except (OSError, UnicodeError, ValueError) as exc:
+        return {"estado": "invalido", "motivo": type(exc).__name__}
+    if not isinstance(d, dict):
+        return {"estado": "invalido", "motivo": "schema_invalido"}
+    partes = d.get("partes")
+    if (d.get("sistema") != "whiterabbit"
+            or isinstance(d.get("versao"), bool)
+            or not isinstance(d.get("versao"), int)
+            or not isinstance(d.get("aplicado_em"), str)
+            or not d["aplicado_em"].strip()
+            or not isinstance(partes, dict)
+            or any(isinstance(partes.get(k), bool)
+                   or not isinstance(partes.get(k), int)
+                   or partes[k] < 0
+                   for k in ("campeoes", "incubacao", "candidatos"))):
+        return {"estado": "invalido", "motivo": "schema_invalido"}
+    return {
+        "estado": "confirmado",
+        "versao": d["versao"],
+        "aplicado_em": d["aplicado_em"],
+        "partes": {k: partes[k] for k in ("campeoes", "incubacao", "candidatos")},
+    }
+
+
 def _sev_slot(s: dict, agora: float) -> tuple[str, str]:
     """(estado, palavra) no padrao da Mesa: ok / warn / bad / off."""
     ef = s.get("estado_efetivo")
@@ -85,7 +116,9 @@ def carregar(agora: float | None = None, base: Path | None = None) -> dict:
     st = _json(base / "receptor" / "status.json")
     roster = _json(base / "live" / "slots.json") or {}
     if not isinstance(st, dict):
-        return {"ok": False, "pasta": str(base), "erro": "receptor sem status.json nesta máquina (ele roda onde a conta demo do White Rabbit opera)"}
+        return {"ok": False, "pasta": str(base),
+                "erro": "receptor sem status.json nesta máquina (ele roda onde a conta demo do White Rabbit opera)",
+                "pacote_aplicado": _pacote_aplicado(base)}
     meta = {x.get("id"): x for x in (roster.get("slots") or []) if isinstance(x, dict)}
     evs = []
     for p in sorted((base / "receptor").glob("eventos-*.jsonl"))[-3:]:
@@ -132,6 +165,7 @@ def carregar(agora: float | None = None, base: Path | None = None) -> dict:
         "conta": {k: conta.get(k) for k in ("login", "servidor", "moeda", "balance", "equity")},
         "book": {k: book.get(k) for k in ("ativo", "saldo", "equity", "abertas", "erros_seguidos")},
         "piso": st.get("piso_lote_minimo"), "roster_versao": roster.get("versao"), "roster_em": roster.get("gerado_em"),
+        "pacote_aplicado": _pacote_aplicado(base),
         "resumo": {"slots": len(slots), "rodando": sum(1 for x in slots if x["estado"] == "ok"),
                    "atencao": sum(1 for x in slots if x["estado"] in ("warn", "bad")),
                    "incubando": sum(1 for x in slots if x["incubacao"]),
